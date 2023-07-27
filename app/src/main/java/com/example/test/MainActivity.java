@@ -8,22 +8,25 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.test.ui.login.LoginActivity;
 
+public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button StartButton =findViewById(R.id.StartButton);
+        Button button =findViewById(R.id.StartButton);
 
-        StartButton.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent =new Intent(getApplicationContext(),MainActivity2.class);
-                startActivity(intent);//버튼 클릭시 다음 페이지(MainActivity->MainActivity2)
-                Toast.makeText(getApplicationContext(),"버튼1 클릭",Toast.LENGTH_LONG).show();
+                Intent intent =new Intent(getApplicationContext(),LoginActivity.class);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(),"로그인 화면으로 이동",Toast.LENGTH_LONG).show();
             }
         });
     }
+
+
 }

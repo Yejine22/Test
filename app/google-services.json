@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "109934896321",
+    "firebase_url": "https://goblet-of-fire-534d9-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "goblet-of-fire-534d9",
+    "storage_bucket": "goblet-of-fire-534d9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:109934896321:android:4b83dbf90325d4be3ee040",
+        "android_client_info": {
+          "package_name": "com.example.test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109934896321-dl50sub08chiirgggg205vjvo11en1f9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEGYUk2Vl3L3EjL1ZohOzk-BTqRTRnygA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109934896321-dl50sub08chiirgggg205vjvo11en1f9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

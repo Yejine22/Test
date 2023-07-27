@@ -2,4 +2,17 @@
     <string name="app_name">Test</string>
     <string name="StringTitle">해리포트</string>
     <string name="StartMessage">시작하기</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="SelectTitle">당신의 전기포트를 선택하세요!</string>
+    <string name="BackToLogin">◀</string>
+    <string name="Temp">온도는 40도입니다.</string>
+    <string name="Locker">Lock</string>
 </resources>
