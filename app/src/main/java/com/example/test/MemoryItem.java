@@ -6,17 +6,17 @@ public class MemoryItem {
     private int hour;
     private int minute;
     private int temperature;
-    private long time;
     private String now;
+    private Boolean Stop;
 
     public MemoryItem() {
         // Default constructor required for Firebase
     }
-    public MemoryItem(int temperature, int hour, int minute, long time) {
+    public MemoryItem(int temperature, int hour, int minute, Boolean Stop) {
         this.hour = hour;
         this.minute = minute;
         this.temperature = temperature;
-        this.time = time;
+        this.Stop=Stop;
     }
 
     public int getHour() {
@@ -29,7 +29,7 @@ public class MemoryItem {
     public int getTemperature() {
         return temperature;
     }
-    public long getTime() { return time; }
+    public Boolean getStop() { return Stop; }
     public void setTemperature(int temperature) {
         this.temperature = temperature;
     }
@@ -42,8 +42,8 @@ public class MemoryItem {
         this.minute = minute;
     }
 
-    public void setTime(long timestamp) {
-        this.time = timestamp;
+    public void setStop(Boolean Stop) {
+        this.Stop=Stop;
     }
 
     public String getString() {
@@ -57,5 +57,21 @@ public class MemoryItem {
         String getTime=dateFormat.format(date);
         this.now=getTime;
         return getTime;
+    }
+
+    public int getPresentHour(){
+        long now=System.currentTimeMillis();
+        Date date=new Date(now);
+        SimpleDateFormat dateFormat=new SimpleDateFormat("HH");
+        String Hour=dateFormat.format(date);
+        return Integer.parseInt(Hour);
+    }
+
+    public int getPresentMinute(){
+        long now=System.currentTimeMillis();
+        Date date=new Date(now);
+        SimpleDateFormat dateFormat=new SimpleDateFormat("mm");
+        String Minute=dateFormat.format(date);
+        return Integer.parseInt(Minute);
     }
 }

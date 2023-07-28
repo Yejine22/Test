@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 public class AdjustActivity extends AppCompatActivity {
 
+    private Boolean Stop=false;
     private TimePicker timePicker;
     private SeekBar seekBar;
     private ArrayList<MemoryItem> memoriesList;
@@ -67,38 +68,58 @@ public class AdjustActivity extends AppCompatActivity {
                tv.setText(String.format("온도는 %d도 입니다.", seekBar.getProgress()));
             }
         });
-        Button button1 =findViewById(R.id.boilingbutton);
+
+        //끓여줘 버튼
+        Button boil =findViewById(R.id.boilingbutton);
         MemoryItem m=new MemoryItem();
-        button1.setOnClickListener(new View.OnClickListener() {
+        boil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
                 int temperature = seekBar.getProgress();
-                Long time = timePicker.getDrawingTime();
                 m.getNow();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference historyRef = database.getReference("사용기록");
 
                 String recordId = historyRef.push().getKey();
-                historyRef.child(recordId).setValue(new MemoryItem(temperature, hour, minute, time));
+                historyRef.child(recordId).setValue(new MemoryItem(temperature, hour, minute, false));
             }
             //버튼 누르면 전기포트 끓이는 설정 연동 코드 추가
         });
+
+        //Lock 스위치
         lockSwitch =findViewById(R.id.LockSwitch);
         lockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // "Lock" 스위치가 활성화된 경우
                 // 버튼들을 비활성화
-                button1.setEnabled(false);
+                boil.setEnabled(false);
 //                button2.setEnabled(false);
             } else {
                 // "Lock" 스위치가 비활성화된 경우
                 // 버튼들을 활성화
-                button1.setEnabled(true);
+                boil.setEnabled(true);
 //                button2.setEnabled(true);
             }
+        });
+
+        //Stop 버튼
+
+        Button stop =findViewById(R.id.EmergencyStopButton);
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Stop=true;
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference historyRef = database.getReference("사용기록");
+
+                String recordId = historyRef.push().getKey();
+                historyRef.child(recordId).setValue(new MemoryItem(-1,-1,-1, Stop));
+            }
+            //버튼 누르면 전기포트 끓이는 설정 연동 코드 추가
         });
     }
 

@@ -12,6 +12,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -76,7 +79,20 @@ public class MainActivity extends AppCompatActivity {
                 KeywordExtractor keywordExtractor = new KeywordExtractor();
                 KeywordInfo keywordInfo = keywordExtractor.extractKeywords(speechInput);
 
-                // 키워드 결과 출력
+                //파이어베이스에 데이터 업로드
+                MemoryItem m=new MemoryItem();
+                int hour = keywordInfo.hour;
+                int minute = keywordInfo.minute;
+                int temperature = keywordInfo.temperature;
+                m.getNow();
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference historyRef = database.getReference("사용기록");
+
+                String recordId = historyRef.push().getKey();
+                historyRef.child(recordId).setValue(new MemoryItem(temperature, hour, minute,false));
+
+                /*// 키워드 결과 출력
                 String keywordMessage = "키워드 추출 결과: \n";
                 keywordMessage += "당장 할건지 여부: " + keywordInfo.isNow + "\n";
                 if (!keywordInfo.isNow) {
@@ -88,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 keywordMessage += "온도: " + keywordInfo.temperature + "도";
 
                 // 결과를 TextView에 설정
-                resultTextView.setText(keywordMessage);
+                resultTextView.setText(keywordMessage);*/
             }
         }
     }
