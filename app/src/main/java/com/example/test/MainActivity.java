@@ -9,11 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -25,20 +26,21 @@ public class MainActivity extends AppCompatActivity {
     TextView inputTextView;
     TextView resultTextView;
 
-    private static final int SPEECH_INPUT=1;
+    private static final int SPEECH_INPUT = 1;
+    private boolean isAutoListening = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button =findViewById(R.id.StartButton);
+        Button button = findViewById(R.id.StartButton);
 
         mic = findViewById(R.id.mic);
         inputTextView = findViewById(R.id.inputTextView); // 입력된 문장을 표시할 TextView
         resultTextView = findViewById(R.id.resultTextView);
 
-        mic.setOnClickListener(new View.OnClickListener() {
+        /*mic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -53,7 +55,18 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, " " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
+        });*/
+        mic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startListening();
+            }
         });
+
+        if (isAutoListening) {
+            startListening();
+        }
+
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -61,21 +74,32 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
     }
+
+    private void startListening() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR"); // 한국어로 설정
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "음성을 입력하세요");
+
+        try {
+            startActivityForResult(intent, SPEECH_INPUT);
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, " " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == SPEECH_INPUT) {
+        if (requestCode == SPEECH_INPUT) {
             if (resultCode == RESULT_OK && data != null) {
                 ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 String speechInput = Objects.requireNonNull(result).get(0);
-                inputTextView.setText("입력된 문장: " + speechInput); // 입력된 문장을 TextView에 표시
-                resultTextView.setText(""); // 이전 결과를 초기화
+                inputTextView.setText("입력된 문장: " + speechInput);
+                resultTextView.setText("");
 
-                // 키워드 추출
                 KeywordExtractor keywordExtractor = new KeywordExtractor();
                 KeywordInfo keywordInfo = keywordExtractor.extractKeywords(speechInput);
 
@@ -87,72 +111,85 @@ public class MainActivity extends AppCompatActivity {
                 m.getNow();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference historyRef = database.getReference("사용기록");
+                DatabaseReference historyRef = database.getReference("memory");
 
                 String recordId = historyRef.push().getKey();
                 historyRef.child(recordId).setValue(new MemoryItem(temperature, hour, minute,false));
 
-                /*// 키워드 결과 출력
                 String keywordMessage = "키워드 추출 결과: \n";
                 keywordMessage += "당장 할건지 여부: " + keywordInfo.isNow + "\n";
-                if (!keywordInfo.isNow) {
-                    keywordMessage += "시: " + keywordInfo.hour + "\n";
-                    if (keywordInfo.minute != -1) {
-                        keywordMessage += "분: " + keywordInfo.minute + "\n";
-                    }
-                }
-                keywordMessage += "온도: " + keywordInfo.temperature + "도";
+                keywordMessage += "시: " + (keywordInfo.hour != -1 ? keywordInfo.hour : 0) + "\n";
+                keywordMessage += "분: " + (keywordInfo.minute != -1 ? keywordInfo.minute : 0) + "\n";
+                keywordMessage += "온도: " + (keywordInfo.temperature != -1 ? keywordInfo.temperature : 100) + "도\n";
+                keywordMessage += "끓여달라고 말했는지 여부: " + keywordInfo.isBoil;
+                resultTextView.setText(keywordMessage);
 
-                // 결과를 TextView에 설정
-                resultTextView.setText(keywordMessage);*/
+                // 음성인식 다시 시작하는 조건
+                if ((((keywordInfo.hour==-1 && keywordInfo.minute==-1
+                        && keywordInfo.isNow && keywordInfo.temperature == -1))
+                        || !speechInput.contains("안녕"))
+                        || !speechInput.contains("끓여 줘"))
+                {
+                    startListening();
+                }
             }
         }
     }
+
     class KeywordExtractor {
         public KeywordInfo extractKeywords(String input) {
             KeywordInfo keywordInfo = new KeywordInfo();
 
-            // Use regular expressions to extract the keywords
             Pattern nowPattern = Pattern.compile("지금|현재|당장");
-            Pattern hourPattern = Pattern.compile("(\\d+)시"); // 변경된 부분
-            Pattern minutePattern = Pattern.compile("(\\d+)분"); // 변경된 부분
+            Pattern hourPattern = Pattern.compile("(\\d+)시");
+            Pattern minutePattern = Pattern.compile("(\\d+)분");
             Pattern temperaturePattern = Pattern.compile("(\\d+)도");
+            Pattern boilPattern = Pattern.compile("끓여 줘");
 
             Matcher nowMatcher = nowPattern.matcher(input);
             Matcher hourMatcher = hourPattern.matcher(input);
             Matcher minuteMatcher = minutePattern.matcher(input);
             Matcher temperatureMatcher = temperaturePattern.matcher(input);
+            Matcher boilMatcher = boilPattern.matcher(input);
 
-            if (nowMatcher.find()) {
-                keywordInfo.isNow = true;
-            }
-            else {
-                keywordInfo.isNow = false;
-            }
-
+            // 만약 키워드가 추출되지 않았을 경우에는 기본값
             if (hourMatcher.find()) {
                 keywordInfo.hour = Integer.parseInt(hourMatcher.group(1));
             }
 
-            if (minuteMatcher.find()) {    // 5분뒤에 물끓여
+            if (minuteMatcher.find()) {
                 keywordInfo.minute = Integer.parseInt(minuteMatcher.group(1));
-            }
-            else {
-                keywordInfo.minute = 0;
             }
 
             if (temperatureMatcher.find()) {
                 keywordInfo.temperature = Integer.parseInt(temperatureMatcher.group(1));
             }
 
+            // 시(hour)와 분(minute)이 모두 추출되지 않았다? => 당장할건지 여부(isNow)가 true
+            if (keywordInfo.hour==-1 && keywordInfo.minute==-1) {
+                keywordInfo.isNow = true;
+            }
+            // 또는 지금, 당장, 현재 세 키워드가 들어가도 당장 할건지 여부는 true
+            else if (nowMatcher.find()) {
+                keywordInfo.isNow = true;
+            }
+
+            //"끓여줘"라는 키워드가 추출되면 isBoil이 true
+            if (boilMatcher.find()) {
+                keywordInfo.isBoil = true;
+            }
+
             return keywordInfo;
         }
     }
 
+
     class KeywordInfo {
-        boolean isNow = true;
+        boolean isNow = false;
+        boolean isBoil = false;
         int hour = -1;
         int minute = -1;
-        int temperature = 100;
+        int temperature = -1;
     }
 }
+

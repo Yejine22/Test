@@ -35,7 +35,7 @@ public class MemoryActivity extends AppCompatActivity {
 
         // 파이어베이스 데이터베이스 인스턴스 가져오기
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        historyRef = database.getReference("사용기록");
+        historyRef = database.getReference("memory");
 
         // "사용기록" 노드에 대한 이벤트 리스너 등록
         historyRef.addValueEventListener(new ValueEventListener() {
@@ -49,10 +49,15 @@ public class MemoryActivity extends AppCompatActivity {
                     MemoryItem record = recordSnapshot.getValue(MemoryItem.class);
                     if (record != null) {
                         if(record.getTemperature()!=-1){
-                            if(record.getHour()==-1){
-                                if(record.getMinute()==0){record.setMinute(record.getPresentMinute());}
+                            if(record.getHour()==-1) {
+                                if (record.getMinute() == -1) {
+                                    record.setMinute(record.getPresentMinute());
+                                }
                                 record.setHour(record.getPresentHour());
                             }
+                            recordList.add(record);
+                        }else{
+                            record.setTemperature(100);
                             recordList.add(record);
                         }
                     }

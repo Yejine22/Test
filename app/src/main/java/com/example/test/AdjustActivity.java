@@ -81,7 +81,7 @@ public class AdjustActivity extends AppCompatActivity {
                 m.getNow();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference historyRef = database.getReference("사용기록");
+                DatabaseReference historyRef = database.getReference("memory");
 
                 String recordId = historyRef.push().getKey();
                 historyRef.child(recordId).setValue(new MemoryItem(temperature, hour, minute, false));
@@ -114,7 +114,7 @@ public class AdjustActivity extends AppCompatActivity {
                 Stop=true;
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference historyRef = database.getReference("사용기록");
+                DatabaseReference historyRef = database.getReference("memory");
 
                 String recordId = historyRef.push().getKey();
                 historyRef.child(recordId).setValue(new MemoryItem(-1,-1,-1, Stop));
