@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 int hour = keywordInfo.hour;
                 int minute = keywordInfo.minute;
                 int temperature = keywordInfo.temperature;
-                m.getNow();
+                m.setNow();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference historyRef = database.getReference("memory");

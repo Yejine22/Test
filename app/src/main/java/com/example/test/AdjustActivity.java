@@ -78,13 +78,16 @@ public class AdjustActivity extends AppCompatActivity {
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
                 int temperature = seekBar.getProgress();
-                m.getNow();
+                m.setNow();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference historyRef = database.getReference("memory");
 
                 String recordId = historyRef.push().getKey();
-                historyRef.child(recordId).setValue(new MemoryItem(temperature, hour, minute, false));
+                //8.13 수정
+                MemoryItem record=new MemoryItem(temperature, hour, minute, false);
+                record.setKey(recordId);
+                historyRef.child(recordId).setValue(record);
             }
             //버튼 누르면 전기포트 끓이는 설정 연동 코드 추가
         });
@@ -121,6 +124,8 @@ public class AdjustActivity extends AppCompatActivity {
             }
             //버튼 누르면 전기포트 끓이는 설정 연동 코드 추가
         });
+
+
     }
 
 }
